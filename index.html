@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knowledge Universe</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
+    <script>
+    MathJax = {
+        tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$']] }
+    };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/function-plot/1.23.3/function-plot.js"></script>
+
+    <style>
+        :root { 
+            --primary: #0ea5e9; 
+            --accent: #bb86fc;
+            --bg: #0f172a; 
+            --card: #1e293b; 
+            --text: #f1f5f9; 
+            --muted: #94a3b8; 
+            --border: rgba(255,255,255,0.1);
+        }
+
+        body { 
+            font-family: 'Padauk', 'Segoe UI', sans-serif; 
+            background: var(--bg); 
+            color: var(--text); 
+            margin: 0; 
+            padding: 20px; 
+            min-height: 100vh;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center;
+        }
+
+        /* Top Navigation Switcher */
+        .app-switcher {
+            background: var(--card);
+            padding: 5px;
+            border-radius: 30px;
+            display: flex;
+            gap: 5px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .switch-btn {
+            padding: 8px 24px;
+            border-radius: 25px;
+            border: none;
+            background: transparent;
+            color: var(--muted);
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+            font-family: 'Padauk', sans-serif;
+        }
+        .switch-btn.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 2px 8px rgba(14, 165, 233, 0.4);
+        }
+
+        h1 { 
+            background: linear-gradient(to right, var(--primary), var(--accent)); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            margin-bottom: 20px; 
+            font-weight: 800; 
+            text-align: center; 
+        }
+
+        /* Container styling */
+        .view-container { width: 100%; max-width: 800px; display: none; animation: fadeIn 0.5s; }
+        .view-container.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ================= LINKS STYLES ================= */
+        .main-tabs { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; justify-content: center; }
+        .main-btn { background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--muted); padding: 8px 20px; border-radius: 20px; cursor: pointer; transition: 0.2s; }
+        .main-btn:hover, .main-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        .sub-tabs-container { width: 100%; margin-bottom: 20px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 12px; display: none; box-sizing: border-box; }
+        .sub-tabs { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+        .sub-btn { background: transparent; border: 1px solid transparent; color: var(--muted); padding: 6px 14px; border-radius: 8px; cursor: pointer; transition: 0.2s; font-size: 0.9rem; }
+        .sub-btn:hover { background: rgba(255,255,255,0.05); color: white; }
+        .sub-btn.active { background: var(--card); color: var(--text); border-color: var(--border); font-weight: 600; }
+
+        details { background: var(--card); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
+        summary { padding: 16px; cursor: pointer; font-weight: bold; background: rgba(255,255,255,0.02); display: flex; justify-content: space-between; align-items: center; color: var(--primary); list-style: none; }
+        summary::-webkit-details-marker { display: none; }
+        summary::after { content: '+'; font-size: 1.2rem; font-weight: bold; }
+        details[open] summary::after { content: '-'; }
+        
+        .link-item { display: flex; align-items: center; gap: 15px; padding: 15px; border-bottom: 1px solid var(--border); text-decoration: none; color: inherit; transition: 0.2s; }
+        .link-item:hover { background: rgba(255,255,255,0.05); }
+        .link-icon { width: 24px; height: 24px; border-radius: 4px; background: white; padding: 2px; object-fit: contain; }
+        .link-title { font-size: 0.95rem; font-weight: 500; }
+        .link-url { font-size: 0.75rem; color: var(--muted); display: block; }
+
+        /* ================= BLOG STYLES ================= */
+        .blog-filters { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+        .filter-btn { background: #111; border: 1px solid #333; color: #888; padding: 8px 18px; border-radius: 20px; cursor: pointer; transition: 0.2s; }
+        .filter-btn.active { background-color: var(--accent); color: #000; font-weight: bold; }
+
+        .post-card { background-color: var(--card); padding: 20px; margin-bottom: 15px; border-radius: 12px; cursor: pointer; border-left: 4px solid var(--accent); transition: transform 0.2s; }
+        .post-card:hover { transform: translateX(5px); background-color: #27354f; }
+        
+        #article-view { display: none; width: 100%; }
+        .back-btn { background: var(--card); color: var(--text); border: 1px solid var(--border); padding: 8px 15px; margin-bottom: 20px; cursor: pointer; border-radius: 8px; }
+        .math-graph { background: #fff; border-radius: 8px; margin: 20px 0; padding: 10px; overflow: hidden; }
+        
+        #loading-indicator { color: var(--primary); font-weight: bold; margin-top: 20px; }
+        .footer { margin-top: auto; padding-top: 30px; color: #64748b; font-size: 0.8rem; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <h1>Knowledge Universe</h1>
+    
+    <div class="app-switcher">
+        <button class="switch-btn active" onclick="switchApp('links')">Links Library</button>
+        <button class="switch-btn" onclick="switchApp('blog')">Articles Blog</button>
+    </div>
+
+    <div id="view-links" class="view-container active">
+        <div id="loading-links">Loading Data...</div>
+        <div class="main-tabs" id="main-tabs"></div>
+        <div class="sub-tabs-container" id="sub-tabs-container">
+            <div class="sub-tabs" id="sub-tabs"></div>
+        </div>
+        <div id="links-content-area"></div>
+    </div>
+
+    <div id="view-blog" class="view-container">
+        
+        <div id="blog-list-view">
+            <div class="blog-filters">
+                <button class="filter-btn active" onclick="filterPosts('Physics', this)">Physics</button>
+                <button class="filter-btn" onclick="filterPosts('Mathematics', this)">Mathematics</button>
+                <button class="filter-btn" onclick="filterPosts('Computation', this)">Computation</button>
+                <button class="filter-btn" onclick="filterPosts('BEHS', this)">BEHS</button>
+            </div>
+            <div id="posts-container"></div>
+        </div>
+
+        <div id="article-view">
+            <button class="back-btn" onclick="showBlogList()">← Back to List</button>
+            <div id="article-content"></div>
+        </div>
+    </div>
+
+    <div class="footer">
+        Data Sources: Google Sheets & JSON<br>
+        Developed for Math, Physics & Computing Enthusiasts
+    </div>
+
+    <script>
+        // ==========================================
+        // GLOBAL APP SWITCHER
+        // ==========================================
+        function switchApp(appName) {
+            // Update Buttons
+            document.querySelectorAll('.switch-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Update Views
+            document.querySelectorAll('.view-container').forEach(div => div.classList.remove('active'));
+            document.getElementById(`view-${appName}`).classList.add('active');
+        }
+
+        // ==========================================
+        // PART 1: LINK SYSTEM LOGIC (CSV)
+        // ==========================================
+        const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTzZiVeEVnkYTU4TR2QQxNxOL6R-xEgrAloqMrJ0VtAuaXzu30qMLodfO33vON0r6gxIQ1CSpzUb5PB/pub?output=csv";
+        let linkData = {};
+        let currentLinkMain = "";
+
+        async function initLinks() {
+            try {
+                const res = await fetch(CSV_URL);
+                if(!res.ok) throw new Error("Connection Failed");
+                const text = await res.text();
+                parseCSV(text);
+                document.getElementById('loading-links').style.display = 'none';
+                renderMainTabs();
+            } catch (e) {
+                document.getElementById('loading-links').innerText = "Link Data Error: " + e.message;
+            }
+        }
+
+        function parseCSV(csvText) {
+            const rows = csvText.split('\n');
+            for(let i=1; i<rows.length; i++) {
+                const cols = rows[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(c => c.replace(/^"|"$/g, '').trim());
+                // Main, Sub, Topic, Name, Url
+                const [main, sub, topic, name, url] = cols;
+                if(!main || !url) continue;
+
+                if(!linkData[main]) linkData[main] = {};
+                if(!linkData[main][sub]) linkData[main][sub] = {};
+                if(!linkData[main][sub][topic]) linkData[main][sub][topic] = [];
+                linkData[main][sub][topic].push({ name, url });
+            }
+        }
+
+        function renderMainTabs() {
+            const container = document.getElementById('main-tabs');
+            const keys = Object.keys(linkData);
+            keys.forEach((cat, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'main-btn';
+                btn.innerText = cat;
+                btn.onclick = () => setMainTab(cat, btn);
+                container.appendChild(btn);
+                if(idx === 0) setTimeout(() => btn.click(), 50);
+            });
+        }
+
+        function setMainTab(cat, btn) {
+            currentLinkMain = cat;
+            document.querySelectorAll('.main-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderSubTabs(cat);
+        }
+
+        function renderSubTabs(mainCat) {
+            const container = document.getElementById('sub-tabs');
+            const wrapper = document.getElementById('sub-tabs-container');
+            container.innerHTML = '';
+            
+            const subKeys = Object.keys(linkData[mainCat] || {});
+            
+            if(subKeys.length > 0) {
+                wrapper.style.display = 'block';
+                subKeys.forEach((sub, idx) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'sub-btn';
+                    btn.innerText = sub;
+                    btn.onclick = () => setSubTab(sub, btn);
+                    container.appendChild(btn);
+                    if(idx === 0) setTimeout(() => btn.click(), 10);
+                });
+            } else {
+                wrapper.style.display = 'none';
+                document.getElementById('links-content-area').innerHTML = '<p style="text-align:center">No Content</p>';
+            }
+        }
+
+        function setSubTab(subCat, btn) {
+            document.querySelectorAll('.sub-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            const container = document.getElementById('links-content-area');
+            container.innerHTML = '';
+            const topics = linkData[currentLinkMain][subCat];
+
+            Object.keys(topics).forEach(topicName => {
+                const details = document.createElement('details');
+                details.open = true;
+                const summary = document.createElement('summary');
+                summary.innerText = topicName;
+                details.appendChild(summary);
+
+                const list = document.createElement('div');
+                list.style.display = 'flex'; list.style.flexDirection = 'column';
+
+                topics[topicName].forEach(link => {
+                    let domain = "";
+                    try { domain = new URL(link.url).hostname; } catch(e){ domain = "google.com"; }
+                    const icon = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+
+                    const a = document.createElement('a');
+                    a.className = 'link-item';
+                    a.href = link.url;
+                    a.target = "_blank";
+                    a.innerHTML = `
+                        <img src="${icon}" class="link-icon" onerror="this.src='https://via.placeholder.com/24'">
+                        <div style="display:flex; flex-direction:column;">
+                            <span class="link-title">${link.name}</span>
+                            <span class="link-url">${link.url}</span>
+                        </div>
+                    `;
+                    list.appendChild(a);
+                });
+                details.appendChild(list);
+                container.appendChild(details);
+            });
+        }
+
+        // ==========================================
+        // PART 2: BLOG SYSTEM LOGIC (JSON/MD)
+        // ==========================================
+        let allPosts = [];
+
+        async function initBlog() {
+            try {
+                // Fetch data.json - requires local server or same folder structure
+                const response = await fetch('data.json?t=' + new Date().getTime());
+                if (!response.ok) throw new Error("data.json not found");
+                const data = await response.json();
+                
+                allPosts = data.sort((a, b) => new Date(b.date) - new Date(a.date));
+                // Trigger initial filter
+                document.querySelector('.filter-btn').click();
+            } catch (err) {
+                console.log('Blog Load Error (Expected if no local data.json):', err);
+                document.getElementById('posts-container').innerHTML = `
+                    <div style="text-align:center; padding:20px; color:#ff5252; background:rgba(255,82,82,0.1); border-radius:8px;">
+                        ⚠️ <b>Blog Data Not Found</b><br>
+                        <small>Please ensure 'data.json' exists in the same folder.</small>
+                    </div>`;
+            }
+        }
+
+        function filterPosts(category, btn) {
+            // UI Update
+            if(btn) {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            }
+
+            showBlogList();
+            const container = document.getElementById('posts-container');
+            container.innerHTML = '';
+
+            if (!allPosts.length) return;
+
+            const filtered = allPosts.filter(post => post.category === category);
+            if(filtered.length === 0) {
+                container.innerHTML = `<p style="text-align:center; color:#666">No posts found in ${category}</p>`;
+                return;
+            }
+
+            filtered.forEach(post => {
+                const item = document.createElement('div');
+                item.className = 'post-card';
+                item.onclick = () => loadArticle(post.filename);
+                item.innerHTML = `
+                    <h4 style="margin:0 0 5px 0; color:#fff">${post.title}</h4>
+                    <span style="color:var(--muted); font-size:0.85rem">📅 ${post.date}</span>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function loadArticle(filename) {
+            document.getElementById('blog-list-view').style.display = 'none';
+            document.getElementById('article-view').style.display = 'block';
+            const contentDiv = document.getElementById('article-content');
+            contentDiv.innerHTML = '<div style="text-align:center; margin-top:20px;">Loading content...</div>';
+
+            fetch(filename)
+                .then(res => {
+                    if (!res.ok) throw new Error("File not found");
+                    return res.text();
+                })
+                .then(md => {
+                    contentDiv.innerHTML = marked.parse(md);
+                    if(window.MathJax) window.MathJax.typesetPromise();
+                    renderGraphs();
+                })
+                .catch(err => {
+                    contentDiv.innerHTML = `<p style="color:red; text-align:center">Error loading article: ${filename}</p>`;
+                });
+        }
+
+        function showBlogList() {
+            document.getElementById('article-view').style.display = 'none';
+            document.getElementById('blog-list-view').style.display = 'block';
+        }
+
+        function renderGraphs() {
+            try {
+                document.querySelectorAll('.math-graph').forEach(graphDiv => {
+                    const equation = graphDiv.getAttribute('data-fn');
+                    const graphId = graphDiv.getAttribute('id');
+                    const pointsAttr = graphDiv.getAttribute('data-points');
+                    
+                    if(!graphId) return;
+
+                    let graphData = [{ fn: equation, color: '#0ea5e9' }];
+
+                    if (pointsAttr) {
+                        try {
+                            const points = JSON.parse(pointsAttr);
+                            graphData.push({
+                                points: points,
+                                fnType: 'points',
+                                graphType: 'scatter',
+                                color: '#ff5252',
+                                attr: { r: 5 }
+                            });
+                        } catch (e) { console.error("Points parse error", e); }
+                    }
+
+                    functionPlot({
+                        target: '#' + graphId,
+                        width: 550, height: 350, grid: true, data: graphData
+                    });
+                });
+            } catch(e) { console.log("Graph Error:", e); }
+        }
+
+        // ==========================================
+        // INITIALIZATION
+        // ==========================================
+        initLinks(); // Start loading Google Sheet data immediately
+        initBlog();  // Start loading Blog JSON immediately
+
+    </script>
+</body>
+</html>
