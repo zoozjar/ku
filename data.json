@@ -1,38 +1,49 @@
+
 [
-    {
-        "title": "Quantum Mechanics & Graph",
-        "date": "2025-11-28",
-        "category": "Physics",
-        "filename": "posts/physics1.md"
-    },
-    {
-        "title": "Quantum Mechanics",
-        "date": "2025-11-28",
-        "category": "Physics",
-        "filename": "posts/physics2.md"
-    },
-    {
-        "title": "Simple Math Graph",
-        "date": "2025-11-28",
-        "category": "Mathematics",
-        "filename": "posts/math1.md"
-    },
-    {
-        "title": "Test Computation",
-        "date": "2025-11-28",
-        "category": "Computation",
-        "filename": "posts/comp1.md"
-    }, 
-    {
-        "title": "Grade 12 Chapter 10",
-        "date": "2025-11-29",
-        "category": "BEHS",
-        "filename": "posts/behs/tena/grade12-chapter10/behs-tena-g12-ch10-1-30-11-2025.md"
-    },
-    {
-        "title": "Grade 12 Chapter 10",
-        "date": "2025-12-01",
-        "category": "BEHS",
-        "filename": "posts/behs/math4ours/grade12-chapter10/behs-math4ours-g12-ch10-1-01-12-2025.md"
-    }
+  {
+    "title": "Quantum Physics မိတ်ဆက်",
+    "date": "2025-12-01",
+    "category": "Physics",
+    "filename": "quantum_intro.md"
+  },
+  {
+    "title": "Calculus: Derivatives အကြောင်း",
+    "date": "2025-11-30",
+    "category": "Mathematics",
+    "filename": "calculus_derivatives.md"
+  },
+  {
+    "title": "Python Programming အခြေခံ",
+    "date": "2025-11-29",
+    "category": "Computation",
+    "filename": "python_basic.md"
+  },
+  {
+    "title": "Grade 12 Chapter 10",
+    "date": "2025-12-0၁",
+    "category": "BEHS",
+    "subcategory": "tena",
+    "filename": "posts/behs/tena/grade12-chapter10/behs-tena-g12-ch10-1-30-11-2025.md"
+  },
+  {
+    "title": "Grade 12 Chapter 10",
+    "date": "2025-12-01",
+    "category": "BEHS",
+    "subcategory": "tena",
+    "filename": "g11_physics_ch2.md"
+  },
+  {
+    "title": "Logic Puzzle: ဦးနှောက်စားမည့် ပုစ္ဆာများ",
+    "date": "2025-12-02",
+    "category": "BEHS",
+    "subcategory": "Math4Ours",
+    "filename": "posts/behs/math4ours/grade12-chapter10/behs-math4ours-g12-ch10-1-01-12-2025.md"
+  },
+  {
+    "title": "Math Games for Students",
+    "date": "2025-11-25",
+    "category": "BEHS",
+    "subcategory": "Math4Ours",
+    "filename": "math_games.md"
+  }
 ]

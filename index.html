@@ -7,9 +7,11 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 
+    <link rel="stylesheet" href="style.css">
+
     <script>
     MathJax = {
-        loader: {load: ['[tex]/enclose']}, // For \enclose{circle}
+        loader: {load: ['[tex]/enclose']},
         tex: { 
             inlineMath: [['$', '$'], ['\\(', '\\)']], 
             displayMath: [['$$', '$$']],
@@ -21,85 +23,54 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/function-plot/1.23.3/function-plot.js"></script>
+</head>
+<body>
 
-    <style>
-        :root { 
-            --primary: #0ea5e9; 
-            --accent: #bb86fc;
-            --bg: #0f172a; 
-            --card: #1e293b; 
-            --text: #f1f5f9; 
-            --muted: #94a3b8; 
-            --border: rgba(255,255,255,0.1);
-        }
+    <h1>Knowledge Universe</h1>
+    
+    <div class="app-switcher">
+        <button class="switch-btn active" onclick="switchApp('links')">Links Library</button>
+        <button class="switch-btn" onclick="switchApp('blog')">Articles Blog</button>
+    </div>
 
-        body { 
-            font-family: 'Padauk', 'Segoe UI', sans-serif; 
-            background: var(--bg); 
-            color: var(--text); 
-            margin: 0; 
-            padding: 20px; 
-            min-height: 100vh;
-            display: flex; 
-            flex-direction: column; 
-            align-items: center;
-        }
-
-        /* Top Navigation Switcher */
-        .app-switcher {
-            background: var(--card);
-            padding: 5px;
-            border-radius: 30px;
-            display: flex;
-            gap: 5px;
-            margin-bottom: 25px;
-            border: 1px solid var(--border);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        }
-        .switch-btn {
-            padding: 8px 24px;
-            border-radius: 25px;
-            border: none;
-            background: transparent;
-            color: var(--muted);
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.3s;
-            font-family: 'Padauk', sans-serif;
-        }
-        .switch-btn.active {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 2px 8px rgba(14, 165, 233, 0.4);
-        }
-
-        h1 { 
-            background: linear-gradient(to right, var(--primary), var(--accent)); 
-            -webkit-background-clip: text; 
-            -webkit-text-fill-color: transparent; 
-            margin-bottom: 20px; 
-            font-weight: 800; 
-            text-align: center; 
-        }
-
-        .view-container { width: 100%; max-width: 800px; display: none; animation: fadeIn 0.5s; }
-        .view-container.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* ================= TABS STYLES (Shared) ================= */
-        .main-tabs, .blog-filters { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; justify-content: center; }
+    <div id="view-links" class="view-container active">
+        <div id="loading-links">Loading Data...</div>
+        <div class="main-tabs" id="main-tabs"></div>
         
-        .main-btn, .filter-btn { 
-            background: rgba(255,255,255,0.05); 
-            border: 1px solid var(--border); 
-            color: var(--muted); 
-            padding: 8px 20px; 
-            border-radius: 20px; 
-            cursor: pointer; 
-            transition: 0.2s; 
-        }
-        .main-btn:hover, .main-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
-        .filter-btn:hover, .filter-btn.active { background: var(--accent); color: #000; border-color: var(--accent); font-weight: bold; }
+        <div class="sub-tabs-container" id="sub-tabs-container" style="display:none;">
+            <div class="sub-tabs" id="sub-tabs"></div>
+        </div>
+        
+        <div id="links-content-area"></div>
+    </div>
 
-        .sub-tabs-container { width: 100%; margin-bottom: 20px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 12px; box-sizing: border-box; }
-        .sub-tabs { display: flex; gap
+    <div id="view-blog" class="view-container">
+        <div id="blog-list-view">
+            <div class="blog-filters">
+                <button class="filter-btn active" onclick="filterPosts('Physics', this)">Physics</button>
+                <button class="filter-btn" onclick="filterPosts('Mathematics', this)">Mathematics</button>
+                <button class="filter-btn" onclick="filterPosts('Computation', this)">Computation</button>
+                <button class="filter-btn" onclick="filterPosts('BEHS', this)">BEHS</button>
+            </div>
+
+            <div class="sub-tabs-container" id="blog-sub-container" style="display:none;">
+                <div class="sub-tabs" id="blog-sub-filters"></div>
+            </div>
+
+            <div id="posts-container"></div>
+        </div>
+
+        <div id="article-view">
+            <button class="back-btn" onclick="showBlogList()">← Back to List</button>
+            <div id="article-content"></div>
+        </div>
+    </div>
+
+    <div class="footer">
+        Data Sources: Google Sheets & JSON<br>
+        Developed for Math, Physics & Computing Enthusiasts
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
