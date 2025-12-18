@@ -17,7 +17,8 @@ let currentLinkMain = "";
 
 async function initLinks() {
     try {
-        const res = await fetch(CSV_URL);
+        // credentials: 'omit' ဆိုတာ "ကွတ်ကီးတွေ မမှတ်ပါနဲ့" လို့ ပြောတာပါ
+        const res = await fetch(CSV_URL, { credentials: 'omit' });
         if(!res.ok) throw new Error("Connection Failed");
         const text = await res.text();
         parseCSV(text);
@@ -192,18 +193,30 @@ function renderBlogPosts(category, subcat) {
     const container = document.getElementById('posts-container');
     container.innerHTML = '';
 
-    const filtered = allPosts.filter(post => {
+    // ၁. အရင်ဆုံး သက်ဆိုင်ရာ Category နဲ့ Subcategory ကို စစ်ထုတ် (Filter) မယ်
+    let filtered = allPosts.filter(post => {
         if (subcat) {
             return post.category === category && post.subcategory === subcat;
         }
         return post.category === category;
     });
 
+    // ၂. ဒီနေရာမှာ Sorting Logic ခွဲမယ်
+    if (category === "BEHS") {
+        // BEHS ဖြစ်ရင် -> ခေါင်းစဉ် (Title) အလိုက် ငယ်စဉ်ကြီးလိုက် စီမယ် (Chapter 1, 2, 10...)
+        filtered.sort((a, b) => a.title.localeCompare(b.title, undefined, {numeric: true}));
+    } else {
+        // BEHS မဟုတ်ရင် (Physics, Math, etc.) -> ရက်စွဲ (Date) အလိုက် အသစ်အပေါ်တင်မယ်
+        filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+    }
+
+    // ၃. Data မရှိရင် စာပြမယ်
     if(filtered.length === 0) {
         container.innerHTML = `<p style="text-align:center; color:#666">No posts found.</p>`;
         return;
     }
 
+    // ၄. ပုံဖော်ပြသမယ် (Render)
     filtered.forEach(post => {
         const item = document.createElement('div');
         item.className = 'post-card';
