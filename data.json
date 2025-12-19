@@ -19,6 +19,13 @@
     "filename": "posts/Test.md"
   },
   {
+    "title": "Schrodinger Equation W1 Exercise",
+    "date": "2025-12-19",
+    "category": "Mathematics",
+    "subcategory": "SE",
+    "filename": "posts/exercise/SE-W1-Ex1-19-12-2025.md"
+  },
+  {
     "title": "Python Programming အခြေခံ",
     "date": "2025-11-29",
     "category": "Computation",
